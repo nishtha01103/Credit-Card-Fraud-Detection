@@ -29,28 +29,33 @@
     </div>
 
     <script>
-        <script>
-document.getElementById("predictForm").addEventListener("submit", function(event) {
-    event.preventDefault();
+        document.getElementById("fraudForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
 
-    let formData = {
-        feature1: document.getElementById("feature1").value,
-        feature2: document.getElementById("feature2").value,
-        feature3: document.getElementById("feature3").value
-    };
+            // Get input values
+            let feature1 = parseFloat(document.getElementById("feature1").value);
+            let feature2 = parseFloat(document.getElementById("feature2").value);
+            let feature3 = parseFloat(document.getElementById("feature3").value);
 
-    fetch("https://credit-card-fraud-detection-uzze.onrender.com/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById("result").innerText = "Prediction: " + data.prediction;
-    })
-    .catch(error => console.error("Error:", error));
-});
-</script>
+            // Prepare request data
+            let requestData = {
+                features: [feature1, feature2, feature3]
+            };
 
+            // Send request to Flask API
+            let response = await fetch("https://credit-card-fraud-detection-uzze.onrender.com/predict", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+})
+
+            // Get the prediction result
+            let result = await response.json();
+
+            // Display result
+            document.getElementById("result").innerText =
+                result.fraud_prediction === 1 ? "🚨 Fraudulent Transaction Detected!" : "✅ Transaction is Safe!";
+        });
+    </script>
 </body>
 </html>
