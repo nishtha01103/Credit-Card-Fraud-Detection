@@ -29,33 +29,46 @@
     </div>
 
     <script>
-        document.getElementById("fraudForm").addEventListener("submit", async function(event) {
-            event.preventDefault();
+       document.getElementById("predictForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent page reload
 
-            // Get input values
-            let feature1 = parseFloat(document.getElementById("feature1").value);
-            let feature2 = parseFloat(document.getElementById("feature2").value);
-            let feature3 = parseFloat(document.getElementById("feature3").value);
+    let formData = {
+        feature1: document.getElementById("feature1").value,
+        feature2: document.getElementById("feature2").value,
+        feature3: document.getElementById("feature3").value
+    };
 
-            // Prepare request data
-            let requestData = {
-                features: [feature1, feature2, feature3]
-            };
+    fetch("https://credit-card-fraud-detection-uzze.onrender.com/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("API Response:", data); // Debugging log
 
-            // Send request to Flask API
-            let response = await fetch("https://credit-card-fraud-detection-uzze.onrender.com/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-})
+        let predictionText = "Unknown";
+        if (data.prediction === 1) {
+            predictionText = "🚨 Fraudulent Transaction Detected! 🚨";
+            document.getElementById("result").style.color = "red"; // Make fraud warning red
+        } else if (data.prediction === 0) {
+            predictionText = "✅ Transaction is Valid ✅";
+            document.getElementById("result").style.color = "green"; // Make valid transaction green
+        }
 
-            // Get the prediction result
-            let result = await response.json();
-
-            // Display result
-            document.getElementById("result").innerText =
-                result.fraud_prediction === 1 ? "🚨 Fraudulent Transaction Detected!" : "✅ Transaction is Safe!";
-        });
+        document.getElementById("result").innerText = predictionText;
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        document.getElementById("result").innerText = "⚠️ Error in prediction.";
+        document.getElementById("result").style.color = "orange"; // Make error message orange
+    });
+});
     </script>
 </body>
 </html>
