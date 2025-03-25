@@ -13,6 +13,9 @@ try:
 except Exception as e:
     print("🚨 Error Loading Model:", str(e))
 
+@app.route("/")
+def home():
+    return "Flask App is Running! Use /predict to test the API."
 
 @app.route('/predict', methods=['POST'])
 def predict():
