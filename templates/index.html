@@ -35,44 +35,50 @@
 
         <h3 id="result"></h3>
     </div>
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("fraudForm").addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent page reload
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById("fraudForm").addEventListener("submit", function (event) {
-                event.preventDefault(); // Prevent page reload
+        let formData = {
+            features: [
+                parseFloat(document.getElementById("feature1").value),
+                parseFloat(document.getElementById("feature2").value),
+                parseFloat(document.getElementById("feature3").value)
+            ]
+        };
 
-                let formData = {
-                    features: [
-                        parseFloat(document.getElementById("feature1").value),
-                        parseFloat(document.getElementById("feature2").value),
-                        parseFloat(document.getElementById("feature3").value)
-                    ]
-                };
+        fetch("https://credit-card-fraud-detection-uzze.onrender.com/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("API Response:", data);  // ✅ Debugging log
 
-                fetch("https://credit-card-fraud-detection-uzze.onrender.com/predict", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    let predictionText = "Unknown";
-                    if (data.fraud_prediction === 1) {
-                        predictionText = "🚨 Fraudulent Transaction Detected! 🚨";
-                        document.getElementById("result").style.color = "red";
-                    } else if (data.fraud_prediction === 0) {
-                        predictionText = "✅ Transaction is Valid ✅";
-                        document.getElementById("result").style.color = "green";
-                    }
-                    document.getElementById("result").innerText = predictionText;
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    document.getElementById("result").innerText = "⚠️ Error in prediction.";
-                    document.getElementById("result").style.color = "orange";
-                });
-            });
+            let predictionText = "Unknown";  // Default value if API fails
+
+            if (data && "fraud_prediction" in data) {  // Check if the response contains 'fraud_prediction'
+                if (data.fraud_prediction === 1) {
+                    predictionText = "🚨 Fraudulent Transaction Detected! 🚨";
+                    document.getElementById("result").style.color = "red";
+                } else if (data.fraud_prediction === 0) {
+                    predictionText = "✅ Transaction is Valid ✅";
+                    document.getElementById("result").style.color = "green";
+                }
+            } else {
+                console.error("API Response does not contain 'fraud_prediction'", data);
+            }
+
+            document.getElementById("result").innerText = predictionText;
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            document.getElementById("result").innerText = "⚠️ Error in prediction.";
+            document.getElementById("result").style.color = "orange";
         });
-    </script>
+    });
+});</script>
 </body>
 </html>

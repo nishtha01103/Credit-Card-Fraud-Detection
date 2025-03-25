@@ -22,6 +22,7 @@ def predict():
     try:
         # Get JSON data from request
         data = request.get_json()
+        print("Received Data:", data)
 
         # Convert to NumPy array and reshape
         features = np.array(data['features']).reshape(1, -1)
@@ -29,8 +30,11 @@ def predict():
         # Predict
         prediction = model.predict(features)[0]
 
+        response = {"fraud_prediction": int(prediction)}
+        print("Response Sent:", response)
+
         # Return result
-        return jsonify({'fraud_prediction': int(prediction)})
+        return jsonify(response)
         # return render_template("index.html",prediction_text="The Prediction is ")
 
     except Exception as e:
