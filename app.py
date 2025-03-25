@@ -23,16 +23,25 @@ def predict():
         data = request.get_json()
         print("Received Data:", data)  # ✅ Log received data
 
-        # Check if 'features' key is present in the received JSON
         if "features" not in data:
             return jsonify({"error": "Missing 'features' key in request"}), 400
 
-        # Ensure 'features' is a list
         if not isinstance(data["features"], list):
             return jsonify({"error": "'features' should be a list"}), 400
 
-        features = np.array(data["features"]).reshape(1, -1)
-        prediction = model.predict(features)[0]
+        try:
+            features = np.array(data["features"]).reshape(1, -1)
+            print("Processed Features:", features)  # ✅ Log processed features
+        except Exception as e:
+            print("NumPy Reshape Error:", str(e))  # ✅ Log NumPy error
+            return jsonify({"error": "NumPy reshape error: " + str(e)}), 400
+
+        try:
+            prediction = model.predict(features)[0]
+            print("Prediction:", prediction)  # ✅ Log prediction
+        except Exception as e:
+            print("Model Prediction Error:", str(e))  # ✅ Log model error
+            return jsonify({"error": "Model prediction error: " + str(e)}), 400
 
         response = {"fraud_prediction": int(prediction)}
         print("Response Sent:", response)  # ✅ Log response
@@ -40,7 +49,8 @@ def predict():
         return jsonify(response)
 
     except Exception as e:
-        return jsonify({'error': str(e)}),400
+        print("General Error:", str(e))  # ✅ Log general error
+        return jsonify({"error": str(e)}), 400
 
 
 if __name__ == '__main__':
