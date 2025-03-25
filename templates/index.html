@@ -36,7 +36,7 @@
         <h3 id="result"></h3>
     </div>
 <script>
-   document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("fraudForm").addEventListener("submit", function (event) {
         event.preventDefault(); // Prevent page reload
 
@@ -48,18 +48,22 @@
             ]
         };
 
+        console.log("Sending Data:", formData);  // ✅ Log what is being sent
+
         fetch("https://credit-card-fraud-detection-uzze.onrender.com/predict", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData)
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log("Raw Response:", response);  // ✅ Log raw response
+            return response.json();
+        })
         .then(data => {
-            console.log("API Response:", data);  // ✅ Debugging log
+            console.log("API Response:", data);  // ✅ Log API response
 
-            let predictionText = "Unknown";  // Default value if API fails
-
-            if (data && "fraud_prediction" in data) {  // Check if the response contains 'fraud_prediction'
+            let predictionText = "Unknown";
+            if (data && "fraud_prediction" in data) {
                 if (data.fraud_prediction === 1) {
                     predictionText = "🚨 Fraudulent Transaction Detected! 🚨";
                     document.getElementById("result").style.color = "red";
@@ -79,6 +83,7 @@
             document.getElementById("result").style.color = "orange";
         });
     });
-});</script>
+});
+   </script>
 </body>
 </html>

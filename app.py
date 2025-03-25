@@ -20,22 +20,24 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # Get JSON data from request
         data = request.get_json()
-        print("Received Data:", data)
+        print("Received Data:", data)  # ✅ Log received data
 
-        # Convert to NumPy array and reshape
-        features = np.array(data['features']).reshape(1, -1)
+        # Check if 'features' key is present in the received JSON
+        if "features" not in data:
+            return jsonify({"error": "Missing 'features' key in request"}), 400
 
-        # Predict
+        # Ensure 'features' is a list
+        if not isinstance(data["features"], list):
+            return jsonify({"error": "'features' should be a list"}), 400
+
+        features = np.array(data["features"]).reshape(1, -1)
         prediction = model.predict(features)[0]
 
         response = {"fraud_prediction": int(prediction)}
-        print("Response Sent:", response)
+        print("Response Sent:", response)  # ✅ Log response
 
-        # Return result
         return jsonify(response)
-        # return render_template("index.html",prediction_text="The Prediction is ")
 
     except Exception as e:
         return jsonify({'error': str(e)}),400
