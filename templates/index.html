@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Credit Card Fraud Detection</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
@@ -13,61 +12,67 @@
         <p>Enter transaction details to check if it's fraudulent.</p>
 
         <form id="fraudForm">
-    <label for="feature1">Feature 1:</label>
-    <input type="number" id="feature1" step="any" required>
+            <label for="feature1">
+                Transaction Amount (scaled) 💰
+                <span class="tooltip">🔍 Enter a value between -2 and 2 based on normalized transaction size.</span>
+            </label>
+            <input type="number" id="feature1" step="any" required>
 
-    <label for="feature2">Feature 2:</label>
-    <input type="number" id="feature2" step="any" required>
+            <label for="feature2">
+                Spending Behavior 📊
+                <span class="tooltip">🔍 -1 to 1 (Represents user’s past spending pattern)</span>
+            </label>
+            <input type="number" id="feature2" step="any" required>
 
-    <label for="feature3">Feature 3:</label>
-    <input type="number" id="feature3" step="any" required>
+            <label for="feature3">
+                Location Risk 🌍
+                <span class="tooltip">🔍 -3 to 3 (Higher value = Higher risk of fraud)</span>
+            </label>
+            <input type="number" id="feature3" step="any" required>
 
-    <button type="submit">Predict</button>
-</form>
+            <button type="submit">🔍 Predict</button>
+        </form>
 
         <h3 id="result"></h3>
     </div>
 
-  <script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("fraudForm").addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent page reload
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("fraudForm").addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent page reload
 
-        let formData = {
-            features: [
-                parseFloat(document.getElementById("feature1").value),
-                parseFloat(document.getElementById("feature2").value),
-                parseFloat(document.getElementById("feature3").value)
-            ]
-        };
+                let formData = {
+                    features: [
+                        parseFloat(document.getElementById("feature1").value),
+                        parseFloat(document.getElementById("feature2").value),
+                        parseFloat(document.getElementById("feature3").value)
+                    ]
+                };
 
-        fetch("https://credit-card-fraud-detection-uzze.onrender.com/predict", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("API Response:", data); // Debugging log
-
-            let predictionText = "Unknown";
-            if (data.fraud_prediction === 1) {
-                predictionText = "🚨 Fraudulent Transaction Detected! 🚨";
-                document.getElementById("result").style.color = "red";
-            } else if (data.fraud_prediction === 0) {
-                predictionText = "✅ Transaction is Valid ✅";
-                document.getElementById("result").style.color = "green";
-            }
-
-            document.getElementById("result").innerText = predictionText;
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            document.getElementById("result").innerText = "⚠️ Error in prediction.";
-            document.getElementById("result").style.color = "orange";
+                fetch("https://credit-card-fraud-detection-uzze.onrender.com/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    let predictionText = "Unknown";
+                    if (data.fraud_prediction === 1) {
+                        predictionText = "🚨 Fraudulent Transaction Detected! 🚨";
+                        document.getElementById("result").style.color = "red";
+                    } else if (data.fraud_prediction === 0) {
+                        predictionText = "✅ Transaction is Valid ✅";
+                        document.getElementById("result").style.color = "green";
+                    }
+                    document.getElementById("result").innerText = predictionText;
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    document.getElementById("result").innerText = "⚠️ Error in prediction.";
+                    document.getElementById("result").style.color = "orange";
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
 </body>
 </html>
